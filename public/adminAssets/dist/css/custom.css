@@ -1,0 +1,73 @@
+/*For Header */
+.main-header {text-align: center;}
+.custom-link {padding-top: 15px;text-align: center;display: inline-block;position: relative;}
+.custom-link a {background: #fff;color:#000;padding: 5px 10px;border-radius: 5px;font-size: 14px;font-weight: 400;}
+
+/*Snackbar for Copy url -> Media File*/
+#snackbar {
+    position: fixed;
+    background: #000;
+    color: #fff;
+    padding: 12px 30px;
+    z-index: 1;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 100px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/*For Media File css*/
+.media-file .upload-container {
+    padding: 30px;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    position: relative;
+}
+
+.media-file .upload-container.dragover {
+    border-color: #3498db;
+    background-color: #f0f8ff;
+}
+
+.media-file .upload-container > i {
+    color: #dad8d8;
+}
+
+.media-file .upload-container p {
+    margin-bottom: 0;
+    color: gray;
+}
+
+.media-file .upload-container input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.media-file .file-preview {
+    text-align: center;
+}
+
+.media-file .file-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin: 5px;
+}
+
+/*Token Input css*/
+.token-input-custom-wrapper .token-input-list{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid #d2d6de;
+    min-height: 34px;
+}

@@ -1,0 +1,629 @@
+{
+	"info": {
+		"_postman_id": "daily-adin-api-v1",
+		"name": "Daily Adin API V1",
+		"description": "Comprehensive API collection for Daily Adin backend. Updated with all endpoint variations.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Home",
+			"item": [
+				{
+					"name": "Get Home Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/home?include=lead,scroll,trending_tag,special,recent,popular,national,politics",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "home"],
+							"query": [
+								{
+									"key": "include",
+									"value": "lead,scroll,trending_tag,special,recent,popular,national,politics",
+									"description": "Comma-separated list of sections or category aliases/IDs"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Contents",
+			"item": [
+				{
+					"name": "Get Contents (General)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/contents?limit=10&page=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "contents"],
+							"query": [
+								{ "key": "limit", "value": "10" },
+								{ "key": "page", "value": "1" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Latest or Popular Contents",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/contents/latest-popular?include=latest,popular",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "contents", "latest-popular"],
+							"query": [
+								{
+									"key": "include",
+									"value": "latest,popular",
+									"description": "Comma-separated list: latest, popular"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Contents by Category (Slug)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/contents?for=category&slug=national&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "contents"],
+							"query": [
+								{ "key": "for", "value": "category" },
+								{ "key": "slug", "value": "national" },
+								{ "key": "limit", "value": "10" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Contents by Tag (Slug)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/contents?for=tag&slug=politics&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "contents"],
+							"query": [
+								{ "key": "for", "value": "tag" },
+								{ "key": "slug", "value": "politics" },
+								{ "key": "limit", "value": "10" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Contents by Writer (ID)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/contents?for=writer&id=1&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "contents"],
+							"query": [
+								{ "key": "for", "value": "writer" },
+								{ "key": "id", "value": "1" },
+								{ "key": "limit", "value": "10" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Single Content",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/contents/1?include=next_ids,writer,tags",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "contents", "1"],
+							"query": [
+								{ "key": "include", "value": "next_ids,writer,tags" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Archive Search",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/archive?keyword=bangladesh&limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "archive"],
+							"query": [
+								{ "key": "keyword", "value": "bangladesh" },
+								{ "key": "date_start", "value": "2024-01-01", "disabled": true },
+								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "Get All Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories?include=subcategories",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories"],
+							"query": [
+								{ "key": "include", "value": "subcategories" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Category by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/1?include=contents",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories", "1"],
+							"query": [
+								{ "key": "include", "value": "contents" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Category by Slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/slug/national?include=subcategories,contents",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories", "slug", "national"],
+							"query": [
+								{ "key": "include", "value": "subcategories,contents" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Subcategories by Category ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/1/subcategories",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories", "1", "subcategories"]
+						}
+					}
+				},
+				{
+					"name": "Get Subcategories by Category Slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/categories/slug/national/subcategories",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "categories", "slug", "national", "subcategories"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Subcategories",
+			"item": [
+				{
+					"name": "Get Subcategory by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/subcategories/1?include=contents",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "subcategories", "1"],
+							"query": [
+								{ "key": "include", "value": "contents" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Subcategory by Slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/subcategories/slug/pol-education?include=contents",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "subcategories", "slug", "pol-education"],
+							"query": [
+								{ "key": "include", "value": "contents" }
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Country",
+			"item": [
+				{
+					"name": "Get Divisions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/divisions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "divisions"]
+						}
+					}
+				},
+				{
+					"name": "Get Division by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/divisions/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "divisions", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get Division by Slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/divisions/slug/dhaka?include=districts",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "divisions", "slug", "dhaka"],
+							"query": [
+								{ "key": "include", "value": "districts" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Districts by Division ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/divisions/1/districts",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "divisions", "1", "districts"]
+						}
+					}
+				},
+				{
+					"name": "Get Districts by Division Slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/divisions/slug/dhaka/districts",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "divisions", "slug", "dhaka", "districts"]
+						}
+					}
+				},
+				{
+					"name": "Get All Districts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/districts",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "districts"]
+						}
+					}
+				},
+				{
+					"name": "Get District by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/districts/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "districts", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get District by Slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/districts/slug/dhaka-district",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "districts", "slug", "dhaka-district"]
+						}
+					}
+				},
+				{
+					"name": "Get Upazilas by District ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/districts/1/upazilas",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "districts", "1", "upazilas"]
+						}
+					}
+				},
+				{
+					"name": "Get Upazilas by District Slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/districts/slug/dhaka-district/upazilas",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "districts", "slug", "dhaka-district", "upazilas"]
+						}
+					}
+				},
+				{
+					"name": "Get Upazila by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/upazilas/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "upazilas", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get Upazila by Slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/upazilas/slug/savar",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "upazilas", "slug", "savar"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Writers",
+			"item": [
+				{
+					"name": "Get All Writers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/writers",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "writers"]
+						}
+					}
+				},
+				{
+					"name": "Get Writer by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/writers/1?include=contents",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "writers", "1"],
+							"query": [
+								{ "key": "include", "value": "contents" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Writer by Slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/writers/slug/john-doe?include=contents",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "writers", "slug", "john-doe"],
+							"query": [
+								{ "key": "include", "value": "contents" }
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Tags",
+			"item": [
+				{
+					"name": "Get All Tags",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/tags",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "tags"]
+						}
+					}
+				},
+				{
+					"name": "Get Tag by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/tags/1?include=contents",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "tags", "1"],
+							"query": [
+								{ "key": "include", "value": "contents" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Tag by Slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/tags/slug/politics?include=contents",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "tags", "slug", "politics"],
+							"query": [
+								{ "key": "include", "value": "contents" }
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Photos",
+			"item": [
+				{
+					"name": "Get All Photos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/photos?limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "photos"],
+							"query": [
+								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				},
+
+				{
+					"name": "Get Photo Album Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/photos/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "photos", "1"]
+						}
+					}
+				},
+				{
+					"name": "Get Photos by Category",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/photos/category/1?limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "photos", "category", "1"],
+							"query": [
+								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Videos",
+			"item": [
+				{
+					"name": "Get All Videos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/videos?limit=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "videos"],
+							"query": [
+								{ "key": "limit", "value": "20" }
+							]
+						}
+					}
+				},
+
+				{
+					"name": "Get Video Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/videos/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "videos", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Utils",
+			"item": [
+				{
+					"name": "Breaking News",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/breaking-news",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "breaking-news"]
+						}
+					}
+				},
+				{
+					"name": "Bangla Date",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/datetime-bn",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "datetime-bn"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000",
+			"type": "string"
+		}
+	]
+}
