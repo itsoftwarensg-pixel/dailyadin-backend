@@ -14,9 +14,14 @@ class VideoController extends Controller
      */
     public function index(Request $request)
     {
-        $limit = $request->limit ?? 20;
+        $limit = min(max((int) ($request->limit ?? 20), 1), 50);
+        $categoryId = $request->integer('category_id');
+        if ($categoryId && !array_key_exists($categoryId, config('helper.video_categories'))) {
+            return response()->json(['success' => false, 'message' => 'Invalid video category.'], 422);
+        }
 
-        $videos = Video::where('status', 1) // Active
+        $videos = Video::where('status', 1)
+            ->when($categoryId, fn ($query) => $query->where('video_category_id', $categoryId))
             ->latest()
             ->paginate($limit);
 

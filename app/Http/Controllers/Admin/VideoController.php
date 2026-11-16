@@ -38,7 +38,9 @@ class VideoController extends Controller
     {
         $request->validate(
             [
-                'embed_code'    => 'required',
+                'embed_code'    => 'nullable|string|required_without:youtube_url',
+                'youtube_url'   => 'nullable|string|required_without:embed_code',
+                'video_category_id' => 'nullable|integer|in:' . implode(',', array_keys(config('helper.video_categories'))),
                 // 'photo'         => 'image',
             ]
         );
@@ -47,7 +49,12 @@ class VideoController extends Controller
         $video->video_category_id    = $request->video_category_id;
         $video->video_type           = $request->video_type;
         $video->title                = $request->title;
-        $video->embed_code           = $request->embed_code;
+        $videoId = $this->extractYouTubeVideoId($request->youtube_url ?: $request->embed_code);
+        if (!$videoId) {
+            return back()->withInput()->withErrors(['youtube_url' => 'Enter a valid YouTube link, video ID, or embed code.']);
+        }
+
+        $video->embed_code           = $videoId;
         $video->description          = $request->description;
 
         /*if ($request->photo) {
@@ -84,7 +91,9 @@ class VideoController extends Controller
     {
         $request->validate(
             [
-                'embed_code'    => 'required',
+                'embed_code'    => 'nullable|string|required_without:youtube_url',
+                'youtube_url'   => 'nullable|string|required_without:embed_code',
+                'video_category_id' => 'nullable|integer|in:' . implode(',', array_keys(config('helper.video_categories'))),
                 // 'photo'         => 'image',
             ]
         );
@@ -92,7 +101,12 @@ class VideoController extends Controller
         $video->video_category_id    = $request->video_category_id;
         $video->video_type           = $request->video_type;
         $video->title                = $request->title;
-        $video->embed_code           = $request->embed_code;
+        $videoId = $this->extractYouTubeVideoId($request->youtube_url ?: $request->embed_code);
+        if (!$videoId) {
+            return back()->withInput()->withErrors(['youtube_url' => 'Enter a valid YouTube link, video ID, or embed code.']);
+        }
+
+        $video->embed_code           = $videoId;
         $video->description          = $request->description;
         $video->status               = $request->status;
 
@@ -124,5 +138,17 @@ class VideoController extends Controller
 
         return redirect()->route('video.index')
             ->with('permissionError', Config::get('helper.permissionErrorMsg'));
+    }
+
+    /** Extract the video ID from a YouTube URL, iframe embed code, or plain ID. */
+    private function extractYouTubeVideoId(?string $value): ?string
+    {
+        $value = trim((string) $value);
+        if (preg_match('/^[A-Za-z0-9_-]{11}$/', $value)) {
+            return $value;
+        }
+
+        $pattern = '~(?:youtu\.be/|youtube(?:-nocookie)?\.com/(?:.*[?&]v=|embed/|shorts/|live/))([A-Za-z0-9_-]{11})~i';
+        return preg_match($pattern, $value, $matches) ? $matches[1] : null;
     }
 }

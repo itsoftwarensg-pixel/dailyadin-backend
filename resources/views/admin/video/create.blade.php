@@ -26,13 +26,29 @@
                         @csrf
                         <div class="box-body">
                             <div class="form-group">
+                                <label for="video_category_id">Video Category</label>
+                                <select id="video_category_id" class="form-control" name="video_category_id">
+                                    <option value="">Select category</option>
+                                    @foreach (config('helper.video_categories') as $id => $name)
+                                        <option value="{{ $id }}" @selected(old('video_category_id') == $id)>{{ $name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('video_category_id')<x-error-message :message="$message"/>@enderror
+                            </div>
+                            <div class="form-group">
                                 <label for="title">Title</label>
                                 <input type="text" class="form-control" id="title" name="title" placeholder="Enter video title">
                                 @error('title')<x-error-message :message="$message"/>@enderror
                             </div>
                             <div class="form-group">
-                                <label for="embed_code">Embed Code</label>
-                                <input type="text" class="form-control" id="embed_code" name="embed_code" placeholder="Enter video embed code">
+                                <label for="youtube_url">YouTube Link <small class="text-muted">(optional)</small></label>
+                                <input type="url" class="form-control" id="youtube_url" name="youtube_url" value="{{ old('youtube_url') }}" placeholder="https://www.youtube.com/watch?v=...">
+                                @error('youtube_url')<x-error-message :message="$message"/>@enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="embed_code">YouTube Embed Code or Video ID <small class="text-muted">(optional)</small></label>
+                                <input type="text" class="form-control" id="embed_code" name="embed_code" value="{{ old('embed_code') }}" placeholder="Paste iframe embed code or video ID">
+                                <p class="help-block">Provide either a YouTube link or an embed code/video ID.</p>
                                 @error('embed_code')<x-error-message :message="$message"/>@enderror
                             </div>
                             <div class="form-group">

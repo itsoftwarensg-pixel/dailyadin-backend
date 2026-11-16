@@ -9,6 +9,7 @@ class Video extends Model
 {
     use SoftDeletes;
     protected $fillable = [
+        'video_category_id',
         'video_type',
         'title',
         'embed_code',

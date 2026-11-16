@@ -31,6 +31,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Title</th>
+                                        <th>Category</th>
                                         <th>Embed Code</th>
                                         <th>Photo</th>
                                         <th>Status</th>
@@ -40,6 +41,7 @@
                                         <tr>
                                             <td>{{ $key + 1 }}</td>
                                             <td>{{ $video->title }}</td>
+                                            <td>{{ config('helper.video_categories.' . $video->video_category_id, 'সর্বশেষ') }}</td>
                                             <td>{{ $video->embed_code }}</td>
                                             <td>
                                                 @if($video->embed_code)

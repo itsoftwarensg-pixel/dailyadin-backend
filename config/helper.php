@@ -27,6 +27,12 @@ return [
         ]
     ],
 
+    'video_categories' => [
+        1 => 'নিউজ',
+        2 => 'বিশ্ব',
+        3 => 'বিনোদন',
+    ],
+
 
     'roleColor' => [
         "success",
