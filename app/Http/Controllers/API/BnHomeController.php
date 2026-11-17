@@ -20,7 +20,7 @@ use App\Models\BnSubCategory;
 use App\Http\Resources\HomeVideoSectionResource;
 use App\Http\Resources\StarProgramResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class BnHomeController extends Controller
 {
@@ -29,6 +29,18 @@ class BnHomeController extends Controller
      */
     public function index(Request $request)
     {
+        // A homepage request aggregates many database queries. Cache the rendered
+        // JSON briefly to collapse concurrent requests into one database run.
+        $cacheKey = 'api:home:' . md5((string) $request->query('include', ''));
+        $cachedResponse = Cache::get($cacheKey);
+
+        if (is_string($cachedResponse)) {
+            return response($cachedResponse, 200, [
+                'Content-Type' => 'application/json',
+                'X-Cache' => 'HIT',
+            ]);
+        }
+
         $includes = $request->include ? explode(',', $request->include) : [];
         $homeData = [];
 
@@ -96,10 +108,14 @@ class BnHomeController extends Controller
             }
         }
 
-        return response()->json([
+        $response = response()->json([
             'success' => true,
             'data'    => $homeData
         ]);
+
+        Cache::put($cacheKey, $response->getContent(), now()->addSeconds(30));
+
+        return $response->header('X-Cache', 'MISS');
     }
 
     /**
@@ -292,7 +308,7 @@ class BnHomeController extends Controller
                     ->orderByRaw("FIELD(id, " . implode(',', $idsToFetch) . ")")
                     ->get();
 
-                return BnContentResource::collection($contents);
+                return $contents;
             }
         }
 

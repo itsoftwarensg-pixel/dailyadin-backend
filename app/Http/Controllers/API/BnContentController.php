@@ -50,7 +50,7 @@ class BnContentController extends Controller
         $for = $request->input('for');
         $id = $request->input('id');
         $slug = $request->input('slug');
-        $limit = max($request->input('limit', 10), 10);
+        $limit = min(max((int) $request->input('limit', 10), 10), 100);
 
         $query = BnContent::with(['category', 'writer']) // Default eager loads
             ->when(in_array('tags', $includes), fn($q) => $q->with('tags'))
@@ -132,7 +132,7 @@ class BnContentController extends Controller
      */
     public function getArchive(Request $request)
     {
-        $limit = max($request->input('limit', 10), 10);
+        $limit = min(max((int) $request->input('limit', 10), 10), 100);
         $keyword = $request->input('keyword');
         $dateStart = $request->input('date_start');
         $dateEnd = $request->input('date_end');
@@ -187,7 +187,7 @@ class BnContentController extends Controller
             ]);
         }
 
-        $limit = max($request->input('limit', 10), 10);
+        $limit = min(max((int) $request->input('limit', 10), 10), 100);
 
         $contents = BnContent::with('category', 'writer')
             ->where('heading', 'LIKE', "%{$heading}%")
