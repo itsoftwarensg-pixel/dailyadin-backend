@@ -16,7 +16,6 @@ use App\Models\Video;
 use App\Models\Writer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -168,26 +167,4 @@ class AdminController extends Controller
         return redirect()->route('loginForm')->with('message', 'You changed your password successfully. Please login again.');
     }
 
-    // /artisan/{action}: optimize, cache, config, route, view, down, up
-    public function artisan(string $action) {
-        $commands = [
-            'optimize' => 'optimize:clear',
-            'cache' => 'cache:clear',
-            'config' => 'config:clear',
-            'route' => 'route:clear',
-            'view' => 'view:clear',
-            'down' => 'down',
-            'up' => 'up',
-        ];
-
-        abort_unless(isset($commands[$action]), 404);
-
-        Artisan::call($commands[$action]);
-
-        return response()->json([
-            'status' => 'ok',
-            'command' => $commands[$action],
-            'output' => trim(Artisan::output()),
-        ]);
-    }
 }

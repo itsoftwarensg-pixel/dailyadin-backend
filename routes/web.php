@@ -35,8 +35,6 @@ Route::get('/', function () {
     return redirect('/admin');
 });
 
-Route::get('/artisan/{action}', [AdminController::class, 'artisan']);
-
 /**
  * Before Login - Admin routes
  */
