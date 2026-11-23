@@ -16,13 +16,15 @@ class TagController extends Controller
     {
         $includes = explode(',', $request->include ?? '');
         
+        $limit = min(max((int) $request->input('limit', 20), 1), 50);
+
         $tags = Tag::when($request->search, fn($q) => $q->search($request->search))
             ->when(in_array('contents', $includes), function ($query) {
                 $query->with(['contents' => function ($q) {
                     $q->latest()->limit(10);
                 }]);
             })
-            ->paginate($request->limit ?? 20);
+            ->paginate($limit);
 
         return response()->json([
             'success' => true,

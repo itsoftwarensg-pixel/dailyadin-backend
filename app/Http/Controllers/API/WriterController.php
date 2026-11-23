@@ -16,13 +16,15 @@ class WriterController extends Controller
     {
         $includes = explode(',', $request->include ?? '');
 
+        $limit = min(max((int) $request->input('limit', 20), 1), 50);
+
         $writers = Writer::where('status', 1)
             ->when(in_array('contents', $includes), function ($query) {
                 $query->with(['contents' => function ($q) {
                     $q->latest()->limit(10);
                 }]);
             })
-            ->paginate($request->limit ?? 20);
+            ->paginate($limit);
 
         return response()->json([
             'success' => true,

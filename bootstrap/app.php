@@ -25,8 +25,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'restrict_admin_domain' => \App\Http\Middleware\RestrictAdminDomain::class,
         ]);
 
-        // Keep the artisan URL reachable so `up` works while the site is down
-        $middleware->preventRequestsDuringMaintenance(except: ['artisan/*']);
+        // Keep only Laravel's lightweight health check reachable during maintenance.
+        // Administrative Artisan actions must never be exposed over HTTP.
+        $middleware->preventRequestsDuringMaintenance(except: ['up']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, Request $request) {

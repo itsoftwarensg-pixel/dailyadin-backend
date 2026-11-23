@@ -10,7 +10,6 @@ use App\Models\BdUpazila;
 use App\Models\BnCategory;
 use App\Models\BnContent;
 use App\Models\BnSubCategory;
-use App\Models\BnTotalHit;
 use App\Models\Writer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,10 +28,13 @@ class BnContentController extends Controller
             ->where('show_content', 1)
             ->findOrFail($id);
 
-        // Increment total hits
-        $hit = BnTotalHit::firstOrNew(['bn_content_id' => $content->id]);
-        $hit->total_hits = ($hit->total_hits ?? 0) + 1;
-        $hit->save();
+        // One atomic write prevents a read/write race and reduces database load
+        // during traffic spikes on a popular article.
+        DB::statement(
+            'INSERT INTO bn_total_hits (bn_content_id, total_hits) VALUES (?, 1) '
+            . 'ON DUPLICATE KEY UPDATE total_hits = total_hits + 1',
+            [$content->id]
+        );
 
         return response()->json([
             'success' => true,

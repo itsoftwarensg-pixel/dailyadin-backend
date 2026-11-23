@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\ElectionController;
 use App\Http\Controllers\API\MenuController;
 use App\Http\Controllers\API\RamadanTimeController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\DateTimeController;
@@ -18,6 +19,16 @@ use App\Http\Controllers\API\TagController;
 use App\Http\Controllers\API\WriterController;
 
 Route::prefix('v1')->middleware('restrict_domain')->group(function () {
+    // Used by uptime monitoring. It verifies that both Laravel and MySQL are available.
+    Route::get('/health', function () {
+        DB::select('select 1');
+
+        return response()->json([
+            'success' => true,
+            'status' => 'ok',
+        ]);
+    });
+
     // Bangla Date & Time API
     Route::get('/datetime-bn', [DateTimeController::class, 'index']);
 
