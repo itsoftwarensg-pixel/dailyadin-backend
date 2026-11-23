@@ -32,15 +32,20 @@ class BnHomeController extends Controller
         // A homepage request aggregates many database queries. Cache the rendered
         // JSON briefly to collapse concurrent requests into one database run.
         $cacheKey = 'api:home:' . md5((string) $request->query('include', ''));
-        $cachedResponse = Cache::get($cacheKey);
+        $rebuilt = false;
+        $json = Cache::flexible($cacheKey, [30, 300], function () use ($request, &$rebuilt) {
+            $rebuilt = true;
+            return $this->buildHomeJson($request);
+        }, ['seconds' => 60]);
 
-        if (is_string($cachedResponse)) {
-            return response($cachedResponse, 200, [
-                'Content-Type' => 'application/json',
-                'X-Cache' => 'HIT',
-            ]);
-        }
+        return response($json, 200, [
+            'Content-Type' => 'application/json',
+            'X-Cache' => $rebuilt ? 'MISS' : 'HIT',
+        ]);
+    }
 
+    private function buildHomeJson(Request $request): string
+    {
         $includes = $request->include ? explode(',', $request->include) : [];
         $homeData = [];
 
@@ -113,9 +118,7 @@ class BnHomeController extends Controller
             'data'    => $homeData
         ]);
 
-        Cache::put($cacheKey, $response->getContent(), now()->addSeconds(30));
-
-        return $response->header('X-Cache', 'MISS');
+        return $response->getContent();
     }
 
     /**

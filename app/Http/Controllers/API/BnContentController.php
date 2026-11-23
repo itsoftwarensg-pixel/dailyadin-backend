@@ -30,11 +30,11 @@ class BnContentController extends Controller
 
         // One atomic write prevents a read/write race and reduces database load
         // during traffic spikes on a popular article.
-        DB::statement(
+        rescue(fn () => DB::statement(
             'INSERT INTO bn_total_hits (bn_content_id, total_hits) VALUES (?, 1) '
             . 'ON DUPLICATE KEY UPDATE total_hits = total_hits + 1',
             [$content->id]
-        );
+        ));
 
         return response()->json([
             'success' => true,
