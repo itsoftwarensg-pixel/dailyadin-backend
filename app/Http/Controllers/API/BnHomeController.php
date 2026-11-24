@@ -17,6 +17,7 @@ use App\Http\Resources\VideoResource;
 use App\Models\HomeVideoSection;
 use App\Models\StarProgram;
 use App\Models\BnSubCategory;
+use App\Services\NewsCache;
 use App\Http\Resources\HomeVideoSectionResource;
 use App\Http\Resources\StarProgramResource;
 use Illuminate\Http\Request;
@@ -31,7 +32,7 @@ class BnHomeController extends Controller
     {
         // A homepage request aggregates many database queries. Cache the rendered
         // JSON briefly to collapse concurrent requests into one database run.
-        $cacheKey = 'api:home:' . md5((string) $request->query('include', ''));
+        $cacheKey = NewsCache::homeKey((string) $request->query('include', ''));
         $rebuilt = false;
         $json = Cache::flexible($cacheKey, [30, 300], function () use ($request, &$rebuilt) {
             $rebuilt = true;
@@ -301,14 +302,15 @@ class BnHomeController extends Controller
             ->first();
 
         if ($position && $position->ids) {
-            $ids = explode(',', $position->ids);
+            $ids = array_filter(array_map('intval', explode(',', $position->ids)));
             $limit = $position->max_content ?? 10;
-            $idsToFetch = array_slice($ids, 0, $limit);
 
-            if (!empty($idsToFetch)) {
+            if (!empty($ids)) {
                 $contents = BnContent::with(['category', 'writer'])
-                    ->whereIn('id', $idsToFetch)
-                    ->orderByRaw("FIELD(id, " . implode(',', $idsToFetch) . ")")
+                    ->where('show_content', 1)
+                    ->whereIn('id', $ids)
+                    ->orderByRaw("FIELD(id, " . implode(',', $ids) . ")")
+                    ->limit($limit)
                     ->get();
 
                 return $contents;
@@ -330,6 +332,7 @@ class BnHomeController extends Controller
         if ($event && $event->news_ids) {
             $ids = array_map('trim', explode(',', $event->news_ids));
             $contents = BnContent::with(['category', 'writer'])
+                ->where('show_content', 1)
                 ->whereIn('id', $ids)
                 ->orderByRaw("FIELD(id, " . implode(',', $ids) . ")")
                 ->get();

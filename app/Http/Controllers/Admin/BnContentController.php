@@ -14,6 +14,7 @@ use App\Models\BnSpecialCategory;
 use App\Models\BnSubCategory;
 use App\Models\Writer;
 use App\Services\ManagePositionService;
+use App\Services\NewsCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -173,21 +174,18 @@ class BnContentController extends Controller
         $bnContent->updated_by                  = auth()->user()->id;
         $bnContent->tag_ids                     = $request->tags;
 
-        if ($request->bg_image_path) {
-            $bnContent->bg_image_path = FileUploadHelper::uploadFile($request->bg_image_path, $bnContent->bg_image_path);
-        }
+        // The form allows no image, but existing databases may require a string.
+        $bnContent->bg_image_path = $request->hasFile('bg_image_path')
+            ? FileUploadHelper::uploadFile($request->file('bg_image_path'))
+            : '';
 
-        // Update the content
-        $bnContent->save();
-
-        // Log history
-        $this->contentHistoryService->store($bnContent);
-
-        // Tag management (add/remove tags)
-        $this->tagOperationService->tagManageOnUpdate($request, $bnContent);
-
-        // Manage positions (category_home, category_inner, lead)
-        $this->manageContentPositions->managePositionsOnContentCreateUpdate($bnContent, $request);
+        DB::transaction(function () use ($bnContent, $request) {
+            $bnContent->save();
+            $this->contentHistoryService->store($bnContent);
+            $this->tagOperationService->tagManageOnUpdate($request, $bnContent);
+            $this->manageContentPositions->managePositionsOnContentCreateUpdate($bnContent, $request);
+        });
+        NewsCache::refresh($bnContent->id);
 
         return redirect(route('bn-content.index'))->with('message', 'Content inserted successfully');
     }
@@ -321,20 +319,14 @@ class BnContentController extends Controller
             }
         }
 
-        // Update the content
-        $bnContent->save();
-
-        // Log history
-        $this->contentHistoryService->update($bnContent, $changes);
-
-        // Release editing lock, Cancel editing
-        $this->setEditingStatus($bnContent, false);
-
-        // Tag management (add/remove tags)
-        $this->tagOperationService->tagManageOnUpdate($request, $bnContent);;
-
-        // Manage updated positions (category_home, category_inner, lead)
-        $this->manageContentPositions->managePositionsOnContentCreateUpdate($bnContent, $request);
+        DB::transaction(function () use ($bnContent, $request, $changes) {
+            $bnContent->save();
+            $this->contentHistoryService->update($bnContent, $changes);
+            $this->setEditingStatus($bnContent, false);
+            $this->tagOperationService->tagManageOnUpdate($request, $bnContent);
+            $this->manageContentPositions->managePositionsOnContentCreateUpdate($bnContent, $request);
+        });
+        NewsCache::refresh($bnContent->id);
 
         return redirect(route('bn-content.index', ['page' => $request->page]))->with('message', 'Content updated successfully');
     }
@@ -439,10 +431,11 @@ class BnContentController extends Controller
             }
         }
 
-        $content->save();
-
-        // Log history
-        $this->contentHistoryService->update($content, $changes);
+        DB::transaction(function () use ($content, $changes) {
+            $content->save();
+            $this->contentHistoryService->update($content, $changes);
+        });
+        NewsCache::refresh($content->id);
 
         return response()->json([
             'success' => true,

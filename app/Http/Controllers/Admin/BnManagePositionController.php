@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Services\NewsCache;
+
 use App\Enums\StatusEnum;
 use App\Models\Tag;
 use App\Models\BnContent;
@@ -100,6 +102,7 @@ class BnManagePositionController extends Controller
         $specialEvent = BnManageSpecialEvent::findOrFail($id);
         $specialEvent->active_status = $specialEvent->active_status == 1 ? 2 : 1;
         $specialEvent->save();
+        NewsCache::refresh();
 
         return response()->json([
             'success' => true,
@@ -207,6 +210,8 @@ class BnManagePositionController extends Controller
                     $message = 'Special Event created successfully';
                 }
 
+                NewsCache::refresh();
+
                 return redirect()->route('manage-position.special-event')->with('message', $message);
             } catch (\Exception $e) {
                 return redirect()->back()->withInput()->with('error', 'Failed to save event: ' . $e->getMessage());
@@ -231,6 +236,8 @@ class BnManagePositionController extends Controller
                 'max_content' => $request->max_content,
             ],
         );
+
+        NewsCache::refresh();
 
         return redirect()->back()->with('message', 'Position updated successfully');
     }
