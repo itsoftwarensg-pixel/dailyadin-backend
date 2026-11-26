@@ -162,6 +162,7 @@ class ReportController extends Controller
         $fontData = $defaultFontConfig['fontdata'];
 
         $mpdf = new Mpdf([
+            'tempDir' => storage_path('framework/cache'),
             'fontDir' => array_merge($fontDirs, [
                 public_path('fonts'),
             ]),
@@ -260,6 +261,7 @@ class ReportController extends Controller
         $fontData = $defaultFontConfig['fontdata'];
 
         $mpdf = new Mpdf([
+            'tempDir' => storage_path('framework/cache'),
             'fontDir' => array_merge($fontDirs, [
                 public_path('fonts'),
             ]),
