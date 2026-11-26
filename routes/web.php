@@ -192,6 +192,7 @@ Route::prefix('/dashboard')->middleware('restrict_admin_domain')->group(function
         Route::prefix('report')->name('report.')->group(function () {
             Route::get('/', [ReportController::class, 'index'])->name('index');
             Route::get('/export-pdf', [ReportController::class, 'exportPdf'])->name('export-pdf');
+            Route::get('/export-excel', [ReportController::class, 'exportExcel'])->name('export-excel');
             Route::get('/{user}', [ReportController::class, 'show'])->name('show');
             Route::get('/{user}/export-pdf', [ReportController::class, 'exportUserPdf'])->name('export-user-pdf');
             Route::get('/{user}/contents', [ReportController::class, 'userContents'])->name('contents');

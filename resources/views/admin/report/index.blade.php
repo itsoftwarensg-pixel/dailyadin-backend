@@ -91,6 +91,11 @@
                                         class="btn btn-success btn-sm" target="_blank">
                                         <i class="fa fa-file-pdf-o"></i> Download
                                     </a>
+
+                                    <a href="{{ route('report.export-excel', ['start_date' => $startDate, 'end_date' => $endDate, 'user_id' => $userId]) }}"
+                                        class="btn btn-success btn-sm">
+                                        <i class="fa fa-file-excel-o"></i> Download Excel
+                                    </a>
                                 </div>
                             </div>
                         </form>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\BnContent;
+use App\Services\SimpleXlsxExporter;
 use Illuminate\Http\Request;
 use Mpdf\Mpdf;
 use Mpdf\Config\ConfigVariables;
@@ -189,6 +190,51 @@ class ReportController extends Controller
 
         $mpdf->WriteHTML($html);
         return $mpdf->Output($filename, 'D');
+    }
+
+    /**
+     * Download the filtered report as an Excel workbook.
+     */
+    public function exportExcel(Request $request, SimpleXlsxExporter $exporter)
+    {
+        $startDate = $request->input('start_date', now()->format('Y-m-d'));
+        $endDate = $request->input('end_date', $startDate);
+        $userId = $request->input('user_id');
+
+        $query = User::query()
+            ->whereNotIn('email', ['bogdadishahali@gmail.com', 'admin@bongosoftbd.com']);
+
+        if ($userId) {
+            $query->where('id', $userId);
+        }
+
+        $users = $query->withCount([
+            'contents as contents_count' => function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+            },
+            'histories as updates_count' => function ($q) use ($startDate, $endDate) {
+                $q->where('action', 'update')
+                    ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+            },
+        ])->with('role')->orderByDesc('contents_count')->get();
+
+        $rows = [['Name', 'Email', 'Role', 'Created Content', 'Updated Content']];
+        foreach ($users as $user) {
+            $rows[] = [
+                $user->name,
+                $user->email,
+                $user->role->name ?? 'N/A',
+                $user->contents_count,
+                $user->updates_count,
+            ];
+        }
+
+        $path = $exporter->create($rows, 'User Report');
+        $filename = "user-report-{$startDate}-to-{$endDate}.xlsx";
+
+        return response()->download($path, $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend(true);
     }
 
     /**
