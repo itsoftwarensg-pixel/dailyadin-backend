@@ -166,7 +166,7 @@
 
     <div class="footer">
         <p>এটি দৈনিক এদিন সিএমএস থেকে একটি স্বয়ংক্রিয়ভাবে তৈরি রিপোর্ট</p>
-        <p>&copy; বঙ্গসফট লি. (https://www.bongosoftbd.com/)</p>
+        <p>Design &amp; Developed by <a href="https://northsouthgroup.com/">NorthSouth Tech Solutions</a>.</p>
     </div>
 </body>
 

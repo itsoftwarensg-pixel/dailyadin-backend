@@ -45,6 +45,22 @@ class SimpleXlsxExporter
         $xml->startDocument('1.0', 'UTF-8', 'yes');
         $xml->startElement('worksheet');
         $xml->writeAttribute('xmlns', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
+        $widths = [];
+        foreach ($rows as $row) {
+            foreach (array_values($row) as $index => $value) {
+                $widths[$index] = max($widths[$index] ?? 0, mb_strwidth((string) $value, 'UTF-8'));
+            }
+        }
+        $xml->startElement('cols');
+        foreach ($widths as $index => $width) {
+            $xml->startElement('col');
+            $xml->writeAttribute('min', (string) ($index + 1));
+            $xml->writeAttribute('max', (string) ($index + 1));
+            $xml->writeAttribute('width', (string) min(80, max(15, $width + 3)));
+            $xml->writeAttribute('customWidth', '1');
+            $xml->endElement();
+        }
+        $xml->endElement();
         $xml->startElement('sheetData');
 
         foreach ($rows as $rowIndex => $row) {
