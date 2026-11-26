@@ -6,6 +6,7 @@ use App\Models\Tag;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TagResource;
+use App\Enums\StatusEnum;
 
 class TagController extends Controller
 {
@@ -18,10 +19,10 @@ class TagController extends Controller
         
         $limit = min(max((int) $request->input('limit', 20), 1), 50);
 
-        $tags = Tag::when($request->search, fn($q) => $q->search($request->search))
+        $tags = Tag::where('status', StatusEnum::ACTIVE->value)->when($request->search, fn($q) => $q->search($request->search))
             ->when(in_array('contents', $includes), function ($query) {
                 $query->with(['contents' => function ($q) {
-                    $q->latest()->limit(10);
+                    $q->where('show_content', 1)->latest()->limit(10);
                 }]);
             })
             ->paginate($limit);
@@ -63,10 +64,10 @@ class TagController extends Controller
     {
         $includes = explode(',', $request->include ?? '');
 
-        $tag = Tag::where($field, $value)
+        $tag = Tag::where($field, $value)->where('status', StatusEnum::ACTIVE->value)
             ->when(in_array('contents', $includes), function ($query) {
                 $query->with(['contents' => function ($q) {
-                    $q->latest()->limit(10);
+                    $q->where('show_content', 1)->latest()->limit(10);
                 }]);
             })
             ->firstOrFail();

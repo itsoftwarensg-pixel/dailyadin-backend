@@ -15,6 +15,7 @@ use App\Models\BnSubCategory;
 use App\Models\Writer;
 use App\Services\ManagePositionService;
 use App\Services\NewsCache;
+use App\Services\HtmlSanitizer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -160,11 +161,12 @@ class BnContentController extends Controller
         $bnContent->meta_keywords               = $request->meta_keywords;
         $bnContent->meta_description            = $request->meta_description;
         $bnContent->content_brief               = $request->content_brief;
-        $bnContent->content_details             = $request->content_details; // News Details/Description
+        $bnContent->content_details             = app(HtmlSanitizer::class)->sanitize($request->content_details); // News Details/Description
         $bnContent->bg_image_caption            = $request->bg_image_caption;
         $bnContent->sound_path                  = $request->sound_path;
         $bnContent->video_path                  = $request->video_path;
-        $bnContent->show_content                = $request->show_content; // Published or Unpublished
+        // Only existing Admin (1) and Senior Sub Editor (6) roles may publish.
+        $bnContent->show_content                = auth()->user()->hasRole(1, 6) ? $request->show_content : StatusEnum::INACTIVE->value;
         $bnContent->show_in_scroll              = $request->show_in_scroll;
         $bnContent->show_in_latest              = $request->show_in_latest;
         $bnContent->show_in_mobile              = $request->show_in_mobile;
@@ -256,6 +258,9 @@ class BnContentController extends Controller
      */
     public function update(Request $request, BnContent $bnContent)
     {
+        if ($bnContent->editable == 2 && (int) $bnContent->editing_by_id !== (int) auth()->id()) {
+            return redirect()->route('bn-content.index')->with('error', 'This content is locked by another editor.');
+        }
         // Validate the request
         $request->validate(
             [
@@ -288,11 +293,11 @@ class BnContentController extends Controller
         $bnContent->meta_keywords               = $request->meta_keywords;
         $bnContent->meta_description            = $request->meta_description;
         $bnContent->content_brief               = $request->content_brief;
-        $bnContent->content_details             = $request->content_details; // News Details/Description
+        $bnContent->content_details             = app(HtmlSanitizer::class)->sanitize($request->content_details); // News Details/Description
         $bnContent->bg_image_caption            = $request->bg_image_caption;
         $bnContent->sound_path                  = $request->sound_path;
         $bnContent->video_path                  = $request->video_path;
-        $bnContent->show_content                = $request->show_content; // Published or Unpublished
+        $bnContent->show_content                = auth()->user()->hasRole(1, 6) ? $request->show_content : $bnContent->show_content;
         $bnContent->show_in_scroll              = $request->show_in_scroll;
         $bnContent->show_in_latest              = $request->show_in_latest;
         $bnContent->show_in_mobile              = $request->show_in_mobile;
@@ -340,6 +345,9 @@ class BnContentController extends Controller
      */
     public function cancel(BnContent $bnContent)
     {
+        if ($bnContent->editable == 2 && (int) $bnContent->editing_by_id !== (int) auth()->id() && !auth()->user()->hasRole(1)) {
+            return redirect()->route('bn-content.index')->with('error', 'Only the active editor or an Admin can release this lock.');
+        }
         $this->setEditingStatus($bnContent, false);
         return redirect(route('bn-content.index'))->with('message', 'Cancelled content editing!');
     }
@@ -402,6 +410,9 @@ class BnContentController extends Controller
      */
     public function cancelEditing(BnContent $bnContent)
     {
+        if ($bnContent->editable == 2 && (int) $bnContent->editing_by_id !== (int) auth()->id() && !auth()->user()->hasRole(1)) {
+            return redirect()->route('uneditableList')->with('error', 'Only the active editor or an Admin can release this lock.');
+        }
         $this->setEditingStatus($bnContent, false);
         return redirect(route('uneditableList'))->with('message', 'Cancelled content editing!');
     }

@@ -21,7 +21,7 @@ class WriterController extends Controller
         $writers = Writer::where('status', 1)
             ->when(in_array('contents', $includes), function ($query) {
                 $query->with(['contents' => function ($q) {
-                    $q->latest()->limit(10);
+                    $q->where('show_content', 1)->latest()->limit(10);
                 }]);
             })
             ->paginate($limit);
@@ -67,7 +67,7 @@ class WriterController extends Controller
             ->where('status', 1)
             ->when(in_array('contents', $includes), function ($query) {
                 $query->with(['contents' => function ($q) {
-                    $q->latest()->limit(10);
+                    $q->where('show_content', 1)->latest()->limit(10);
                 }]);
             })
             ->firstOrFail();

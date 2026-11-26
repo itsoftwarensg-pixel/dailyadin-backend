@@ -42,7 +42,7 @@ class BnUpazilaController extends Controller
             })
             ->when(in_array('contents', $includes), function ($query) {
                 $query->with(['contents' => function ($q) {
-                    $q->latest()->limit(10);
+                    $q->where('show_content', 1)->latest()->limit(10);
                 }]);
             })
             ->firstOrFail();
@@ -64,7 +64,7 @@ class BnUpazilaController extends Controller
             ->with('district.division')
             ->when(in_array('contents', $includes), function ($query) {
                 $query->with(['contents' => function ($q) {
-                    $q->latest()->limit(10);
+                    $q->where('show_content', 1)->latest()->limit(10);
                 }]);
             })
             ->firstOrFail();

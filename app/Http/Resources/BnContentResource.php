@@ -6,6 +6,7 @@ use App\Helpers\BengaliDateHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
+use App\Services\HtmlSanitizer;
 
 class BnContentResource extends JsonResource
 {
@@ -146,11 +147,14 @@ class BnContentResource extends JsonResource
     {
         if (empty($content)) return $content;
 
+        // Also protect readers from legacy records that predate input sanitizing.
+        $content = app(HtmlSanitizer::class)->sanitize($content);
+
         return preg_replace_callback('/\[(\d+)\]/', function ($matches) {
             $id = $matches[1];
-            $news = \App\Models\BnContent::with('category')->find($id);
+            $news = \App\Models\BnContent::with('category')->where('show_content', 1)->find($id);
 
-            if (!$news) return $matches[0];
+            if (!$news) return '';
 
             $url = rtrim(config('app.frontend_url'), '/') . '/' . ($news->category->alias ?? 'news') . '/' . $news->id;
             $imagePath = $news->bg_image_path ? image_url(config('helper.uploadPath') . $news->bg_image_path) : null;

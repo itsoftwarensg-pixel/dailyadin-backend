@@ -182,7 +182,7 @@
                                                         @if (auth()->user()->role_id == 1 || auth()->user()->id == optional($bnContent->editingBy)->id)
                                                             <form
                                                                 action="{{ route('bn-content.cancel', ['bn_content' => $bnContent->id]) }}"
-                                                                method="GET" style="display: inline;">
+                                                                method="POST" style="display: inline;">
                                                                 @csrf
                                                                 <button class="btn btn-success btn-block btn-flat btn-xs"
                                                                     type="submit">

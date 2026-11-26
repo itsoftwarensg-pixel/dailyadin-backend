@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -36,6 +38,10 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
+        $throttleKey = Str::lower((string) $request->input('email')).'|'.$request->ip();
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            return back()->withErrors(['email' => 'Too many login attempts. Please try again later.']);
+        }
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
@@ -46,6 +52,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             if ($user->status == 1) { // or StatusEnum::ACTIVE if using enum
+                RateLimiter::clear($throttleKey);
                 return redirect()->intended(route('adminDashboard'));
             }
 
@@ -58,6 +65,7 @@ class AuthController extends Controller
         }
 
         // Invalid credentials
+        RateLimiter::hit($throttleKey, 60);
         return redirect()->route('loginForm')->with('error', 'Login details are not valid');
     }
 

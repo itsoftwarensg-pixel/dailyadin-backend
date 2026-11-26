@@ -58,7 +58,7 @@ class BnDistrictController extends Controller
             ->when(in_array('contents', $includes), function ($query) {
                 $query->with([
                     'contents' => function ($q) {
-                        $q->latest()->limit(10);
+                    $q->where('show_content', 1)->latest()->limit(10);
                     },
                 ]);
             })
@@ -109,7 +109,7 @@ class BnDistrictController extends Controller
             ->when(in_array('contents', $includes), function ($query) {
                 $query->with([
                     'contents' => function ($q) {
-                        $q->latest()->limit(10);
+                        $q->where('show_content', 1)->latest()->limit(10);
                     },
                 ]);
             })

@@ -21,7 +21,7 @@ class BnDivisionController extends Controller
         $divisions = BdDivision::when(in_array('contents', $includes), function ($query) {
             $query->with([
                 'contents' => function ($q) {
-                    $q->latest()->limit(10);
+                    $q->where('show_content', 1)->latest()->limit(10);
                 },
             ]);
         })->get();
@@ -60,7 +60,7 @@ class BnDivisionController extends Controller
             ->when(in_array('contents', $includes), function ($query) {
                 $query->with([
                     'contents' => function ($q) {
-                        $q->latest()->limit(10);
+                        $q->where('show_content', 1)->latest()->limit(10);
                     },
                 ]);
             })
@@ -112,7 +112,7 @@ class BnDivisionController extends Controller
             ->when(in_array('contents', $includes), function ($query) {
                 $query->with([
                     'contents' => function ($q) {
-                        $q->latest()->limit(10);
+                        $q->where('show_content', 1)->latest()->limit(10);
                     },
                 ]);
             })

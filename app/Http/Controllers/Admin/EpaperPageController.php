@@ -36,7 +36,7 @@ class EpaperPageController extends Controller
         // Validate allowed file types
         // Max 20 MB
         $request->validate([
-            'file' => 'required|mimes:jpg,jpeg,png,webp,svg|max:20480',
+            'file' => 'required|image|mimes:jpg,jpeg,png,webp|max:20480',
         ]);
 
         $epaperPage = new EpaperPage();
@@ -67,7 +67,7 @@ class EpaperPageController extends Controller
     {
         $request->validate(
             [
-                'file' => 'required|mimes:jpg,jpeg,png,webp,svg|max:20480',
+                'file' => 'required|image|mimes:jpg,jpeg,png,webp|max:20480',
             ]
         );
 

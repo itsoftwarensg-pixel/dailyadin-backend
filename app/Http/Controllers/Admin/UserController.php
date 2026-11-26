@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -26,15 +27,16 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $search = $request->search;
-        $roleIds = Role::pluck('id');
+        $roleIds = Role::where('status', StatusEnum::ACTIVE->value)->pluck('id');
 
         // Here bogdadishahali@gmail.com is admin from bongosoft and kept hidden due to system security.
         $users = User::withTrashed()->with('role')->whereNotIn('email', $this->adminEmails)->whereIn('role_id', $roleIds);
 
         if ($search) {
-            $users = $users
-                ->where('name', 'like', '%' . $search . '%')
-                ->orWhere('email', 'like', '%' . $search . '%');
+            $users->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%');
+            });
         }
 
         $users = $users
@@ -66,7 +68,7 @@ class UserController extends Controller
             [
                 'name'          => 'required',
                 'email'         => 'required|email|unique:users', // TODO:: If user is removed by softDelete then email should be unique
-                'role_id'       => 'required',
+                'role_id'       => ['required', Rule::exists('roles', 'id')->where('status', StatusEnum::ACTIVE->value)->whereNot('id', 1)],
                 'password'      => 'required|confirmed|min:6',
                 'photo'         => 'image',
             ],
@@ -130,7 +132,7 @@ class UserController extends Controller
             [
                 'name'          => 'required',
                 'email'         => 'required|email|unique:users,email,' . $user->id,
-                'role_id'       => 'required',
+                'role_id'       => ['required', Rule::exists('roles', 'id')->where('status', StatusEnum::ACTIVE->value)->whereNot('id', 1)],
                 'password'      => $request->password ? 'confirmed|min:6' : '',
                 'photo'         => 'image',
                 'status'        => 'required',
@@ -194,7 +196,7 @@ class UserController extends Controller
      */
     public function userPasswordEdit(User $user)
     {
-        if ($user && $user->role_id == 1) {
+        if ($user && !in_array($user->email, $this->adminEmails, true)) {
             return view('admin.user.changePassword', ['user' => $user]);
         }
         return redirect()->route('user.index')->with('error', 'Invalid user. No user found');
@@ -205,7 +207,10 @@ class UserController extends Controller
      */
     public function userPasswordUpdate(Request $request, $id)
     {
-        $user = User::find($id);
+        $user = User::findOrFail($id);
+        if (in_array($user->email, $this->adminEmails, true)) {
+            return redirect()->route('user.index')->with('error', 'This protected account password cannot be changed here.');
+        }
         $request->validate([
             'password' => 'required|confirmed|min:6',
         ]);
@@ -222,7 +227,7 @@ class UserController extends Controller
      */
     public function userRestore(User $user)
     {
-        if ($user) {
+        if ($user && $user->trashed()) {
             $user->restore();
             return redirect()->route('user.index')->with('message', 'User has been restored from this system!');
         }

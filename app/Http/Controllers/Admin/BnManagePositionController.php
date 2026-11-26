@@ -153,7 +153,7 @@ class BnManagePositionController extends Controller
         }
 
         return BnContent::whereIn('id', $ids)
-            ->orderByRaw("FIELD(id, " . implode(',', $ids) . ")")
+            ->orderByRaw('FIELD(id, '.implode(',', array_fill(0, count($ids), '?')).')', $ids)
             ->get();
     }
 
@@ -169,7 +169,7 @@ class BnManagePositionController extends Controller
         }
 
         return Tag::whereIn('id', $ids)
-            ->orderByRaw("FIELD(id, " . implode(',', $ids) . ")")
+            ->orderByRaw('FIELD(id, '.implode(',', array_fill(0, count($ids), '?')).')', $ids)
             ->get();
     }
 

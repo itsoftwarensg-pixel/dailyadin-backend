@@ -40,14 +40,14 @@ Route::get('/', function () {
  */
 Route::prefix('/admin')->middleware('restrict_admin_domain')->group(function () {
     Route::get('/', [AuthController::class, 'loginForm'])->name('loginForm');
-    Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login');
 });
 
 /**
  * After Login - Dashboard routes
  */
 Route::prefix('/dashboard')->middleware('restrict_admin_domain')->group(function () {
-    Route::middleware(['auth'])->group(function () {
+    Route::middleware(['auth', 'active_user'])->group(function () {
         Route::get('/', [AdminController::class, 'dashboard'])->name('adminDashboard');
 
         // Only SuperAdmin can access the following routes
@@ -67,7 +67,7 @@ Route::prefix('/dashboard')->middleware('restrict_admin_domain')->group(function
             Route::get('total-hits', [TotalHitController::class, 'bnContentTopHitList'])->name('bnContentTopHitList');
 
             // Content cancel editing route
-            Route::get('{bn_content}/cancel', [BnContentController::class, 'cancel'])->name('bn-content.cancel');
+            Route::post('{bn_content}/cancel', [BnContentController::class, 'cancel'])->name('bn-content.cancel');
 
             // Only for editable list
             Route::get('uneditable-list', [BnContentController::class, 'uneditableList'])->name('uneditableList');

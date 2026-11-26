@@ -36,7 +36,7 @@ class MediaFileController extends Controller
         // Validate allowed file types
         // Max 20 MB
         $request->validate([
-            'file' => 'required|mimes:doc,docx,pdf,jpg,jpeg,png,webp,svg,mp3,mp4,xls,xlsx|max:20480',
+            'file' => 'required|file|mimes:doc,docx,pdf,jpg,jpeg,png,webp,mp3,mp4,xls,xlsx|max:20480',
         ]);
 
         $mediaFile = new MediaFile();

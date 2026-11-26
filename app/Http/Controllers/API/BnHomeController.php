@@ -198,7 +198,7 @@ class BnHomeController extends Controller
 
         $trendingTags = [];
         foreach ($tags as $tag) {
-            $contents = $tag->contents()->with(['category', 'writer'])->latest()->limit(10)->get();
+            $contents = $tag->contents()->with(['category', 'writer'])->where('show_content', 1)->latest()->limit(10)->get();
             $trendingTags[] = [
                 'name' => $tag->name,
                 'url'  => url('tags/' . $tag->alias),
@@ -309,7 +309,7 @@ class BnHomeController extends Controller
                 $contents = BnContent::with(['category', 'writer'])
                     ->where('show_content', 1)
                     ->whereIn('id', $ids)
-                    ->orderByRaw("FIELD(id, " . implode(',', $ids) . ")")
+                    ->orderByRaw('FIELD(id, '.implode(',', array_fill(0, count($ids), '?')).')', $ids)
                     ->limit($limit)
                     ->get();
 
@@ -333,8 +333,8 @@ class BnHomeController extends Controller
             $ids = array_map('trim', explode(',', $event->news_ids));
             $contents = BnContent::with(['category', 'writer'])
                 ->where('show_content', 1)
-                ->whereIn('id', $ids)
-                ->orderByRaw("FIELD(id, " . implode(',', $ids) . ")")
+            ->whereIn('id', $ids)
+            ->orderByRaw('FIELD(id, '.implode(',', array_fill(0, count($ids), '?')).')', $ids)
                 ->get();
 
             return [

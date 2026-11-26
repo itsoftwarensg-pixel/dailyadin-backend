@@ -139,7 +139,6 @@ class WebstoryController extends Controller
                         $webstoryContent->image = FileUploadHelper::uploadFile($content['image'], $webstoryContent->image);
                     } else {
                         // No new upload → keep old one from hidden field
-                        $webstoryContent->image = $content['content_hidden_image'] ?? $webstoryContent->image;
                     }
 
                     $webstoryContent->save();
@@ -152,9 +151,7 @@ class WebstoryController extends Controller
                 foreach ($toDelete as $delId) {
                     $content = WebstoryContent::find($delId);
                     // Delete image if exists for this content
-                    if ($content->image && file_exists(public_path('uploads/'.$content->image))) {
-                        unlink(public_path('uploads/'.$content->image));
-                    }
+                    FileUploadHelper::deleteFile($content->image);
                     $content->delete();
                 }
             }

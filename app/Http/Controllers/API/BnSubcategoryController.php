@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BnSubcategoryResource;
 use App\Models\BnSubCategory;
+use App\Enums\StatusEnum;
 use Illuminate\Http\Request;
 
 class BnSubcategoryController extends Controller
@@ -38,7 +39,8 @@ class BnSubcategoryController extends Controller
     {
         $includes = explode(',', $request->include ?? '');
 
-        $query = BnSubcategory::where($field, $value)->with('category');
+        $query = BnSubcategory::where($field, $value)->where('status', StatusEnum::ACTIVE->value)
+            ->whereHas('category', fn ($q) => $q->where('status', StatusEnum::ACTIVE->value))->with('category');
 
         if ($categorySlug) {
             $query->whereHas('category', function ($q) use ($categorySlug) {
@@ -49,7 +51,7 @@ class BnSubcategoryController extends Controller
         $subcategory = $query->when(in_array('contents', $includes), function ($query) {
             $query->with([
                 'contents' => function ($q) {
-                    $q->with('category')->latest()->limit(10);
+                    $q->with('category')->where('show_content', 1)->latest()->limit(10);
                 },
             ]);
         })

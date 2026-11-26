@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureUserHasRole;
+use App\Http\Middleware\EnsureActiveUser;
 use App\Http\Middleware\RestrictDomain;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Global middleware stack
         $middleware->alias([
             'role' => EnsureUserHasRole::class,
+            'active_user' => EnsureActiveUser::class,
             'restrict_domain' => RestrictDomain::class,
             'restrict_admin_domain' => \App\Http\Middleware\RestrictAdminDomain::class,
         ]);

@@ -54,7 +54,7 @@ class BnCategoryController extends Controller
             ->when(in_array('contents', $includes), function ($query) {
                 $query->with([
                     'contents' => function ($q) {
-                        $q->with('category')->latest()->limit(10);
+                        $q->with('category')->where('show_content', 1)->latest()->limit(10);
                     },
                 ]);
             })
@@ -78,7 +78,7 @@ class BnCategoryController extends Controller
             ->when(in_array('subcategories', $includes), fn($q) => $q->with('subcategories'))
             ->when(in_array('contents', $includes), function ($query) {
                 $query->with(['contents' => function ($q) {
-                    $q->with('category');
+                    $q->with('category')->where('show_content', 1);
                     $q->latest()->limit(10);
                 }]);
             })
@@ -122,11 +122,11 @@ class BnCategoryController extends Controller
         $includes = explode(',', $request->include ?? '');
 
         // Get category
-        $category = BnCategory::where($field, $value)
+        $category = BnCategory::where($field, $value)->where('status', StatusEnum::ACTIVE->value)
             ->when(in_array('subcategories', $includes), fn($q) => $q->with('subcategories'))
             ->when(in_array('contents', $includes), function ($query) {
                 $query->with(['contents' => function ($q) {
-                    $q->with('category');
+                    $q->with('category')->where('show_content', 1);
                     $q->latest()->limit(10);
                 }]);
             })->firstOrFail();
@@ -158,8 +158,9 @@ class BnCategoryController extends Controller
 
             if (!empty($idsToFetch)) {
                 $category->position_contents = BnContent::with('category')
+                    ->where('show_content', 1)
                     ->whereIn('id', $idsToFetch)
-                    ->orderByRaw("FIELD(id, " . implode(',', $idsToFetch) . ")")
+                    ->orderByRaw('FIELD(id, '.implode(',', array_fill(0, count($idsToFetch), '?')).')', $idsToFetch)
                     ->get();
             }
         }

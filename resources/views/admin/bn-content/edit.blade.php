@@ -528,8 +528,10 @@
                                         <a href="{{ route('bn-content.index') }}" class="btn btn-primary btn-lg">Back</a>
                                     </div>
                                     <div class="col-sm-6 text-right">
-                                        <a href="{{ route('bn-content.cancel', ['bn_content' => $bnContent->id]) }}"
-                                            class="btn btn-warning btn-lg">Cancel Editing</a>
+                                        <form action="{{ route('bn-content.cancel', ['bn_content' => $bnContent->id]) }}" method="POST" style="display:inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-warning btn-lg">Cancel Editing</button>
+                                        </form>
                                         <button type="submit" class="btn btn-success btn-lg">Update</button>
                                     </div>
                                 </div>

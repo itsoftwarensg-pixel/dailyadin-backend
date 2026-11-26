@@ -152,7 +152,6 @@ class PhotoAlbumController extends Controller
                         $photo->image = FileUploadHelper::uploadFile($request->file("contents.$key.image"), $photo->image);
                     } else {
                         // No new upload → keep old one from hidden field
-                        $photo->image = $content['content_hidden_image'] ?? $photo->image;
                     }
 
                     $photo->save();
@@ -165,9 +164,7 @@ class PhotoAlbumController extends Controller
                 foreach ($toDelete as $delId) {
                     $content = Photo::find($delId);
                     // Delete image if exists for this content
-                    if ($content->image && file_exists(public_path('uploads/'.$content->image))) {
-                        unlink(public_path('uploads/'.$content->image));
-                    }
+                    FileUploadHelper::deleteFile($content->image);
                     $content->delete();
                 }
             }
